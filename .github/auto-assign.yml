@@ -1,0 +1,7 @@
+addReviewers: true
+addAssignees: author
+numberOfReviewers: 0
+reviewers:
+  - qftgtr
+  - flowfire
+  - iNorthIsle
