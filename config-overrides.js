@@ -95,8 +95,9 @@ const overrides = [
     '@obsidians/compiler': `@obsidians/${process.env.BUILD}-compiler`,
     '@obsidians/project': `@obsidians/${process.env.BUILD}-project`,
     '@obsidians/contract': `@obsidians/${process.env.BUILD}-contract`,
-    '@obsidians/explorer': `@obsidians/${process.env.BUILD}-explorer`,
-    '@obsidians/network': `@obsidians/${process.env.BUILD}-network`,
+    '@obsidians/explorer': `@obsidians/${process.env.PROJECT}-explorer`,
+    '@obsidians/network': `@obsidians/${process.env.PROJECT}-network`,
+    '@obsidians/sdk': `@obsidians/${process.env.PROJECT}-sdk`,
     '@obsidians/node': `@obsidians/${process.env.BUILD}-node`,
     '@obsidians/premium-editor': path.resolve(
       __dirname,

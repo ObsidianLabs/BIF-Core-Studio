@@ -17,6 +17,13 @@ module.exports = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.jsx', '.json']
   },
+  module: {
+    unknownContextCritical: false,
+    exprContextCritical: false,
+  },
+  amd: {
+    toUrlUndefined: true
+  },
   devtool: 'source-map',
   plugins: []
 }
