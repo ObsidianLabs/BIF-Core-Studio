@@ -45,7 +45,7 @@ class HeaderWithRedux extends PureComponent {
     if (this.props.network !== props.network) {
       const network = this.props.network
       KeypairInputSelector.defaultProps = {
-        filter: k => k.address?.startsWith(prefix[network] || '0x')
+        // filter: k => k.address?.startsWith(prefix[network] || '0x')
       }
     }
   }
