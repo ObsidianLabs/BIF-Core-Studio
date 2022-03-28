@@ -2,7 +2,11 @@ import React, { PureComponent } from 'react'
 
 import platform from '@obsidians/platform'
 import { connect } from '@obsidians/redux'
-import Project from '@obsidians/project'
+import Project, { DeployButton } from '@obsidians/project'
+
+DeployButton.defaultProps = {
+  skipEstimate: true
+}
 
 class ProjectWithProps extends PureComponent {
   async componentDidMount() {
