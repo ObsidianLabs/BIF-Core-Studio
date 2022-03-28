@@ -3,8 +3,8 @@ import Immutable, { List, Map } from 'immutable'
 export { redux as profile } from '@obsidians/auth'
 export { redux as projects } from '@obsidians/workspace'
 export { redux as keypairs } from '@obsidians/keypair'
-export { redux as abis } from '@obsidians/eth-sdk'
-export { redux as customNetworks } from '@obsidians/eth-network'
+export { redux as abis } from '@obsidians/sdk'
+export { redux as customNetworks } from '@obsidians/network'
 export { redux as queue } from '@obsidians/queue'
 
 export const version = {

@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 
 import platform from '@obsidians/platform'
 import { connect } from '@obsidians/redux'
-import Project from '@obsidians/eth-project'
+import Project from '@obsidians/project'
 
 class ProjectWithProps extends PureComponent {
   async componentDidMount() {
