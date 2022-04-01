@@ -3,7 +3,7 @@ button, .btn, .nav-link {
 }
 
 .btn-default {
-  @include button-variant($gray-800, transparent, $secondary, transparent, $dark, transparent);
+  @include button-variant($background, transparent, $secondary, transparent, $dark, transparent);
 }
 
 .btn-transparent {

@@ -13,15 +13,15 @@ $black: hsl(224, 10%, 8%);
 $light: $gray-100;
 $dark: $gray-900;
 $dark2: mix($black, $dark, 40%);
-$background: $gray-800;
-$background2: mix($dark, $background, 100%);
-$border: $black;
+$background:hsl(226,19%,21%);
+$background2: hsl(222,24%,13%);
+$border: #11151e;
 $border-width: 0;
 
 $body-bg: $background;
 $body-color: $white;
 
-$primary: hsl(234, 35%, 55%);
+$primary: hsl(220,70%,55%);
 $secondary: $gray-700;
 $danger: hsl(354, 55%, 60%);
 $warning: hsl(46, 55%, 50%);
@@ -30,4 +30,4 @@ $info: hsl(203, 70%, 65%);
 $yellow: hsl(37, 92%, 43%);
 $red: hsl(351, 54%, 58%);
 
-$link-color: hsl(230, 80%, 73%);
+$link-color: $primary;
