@@ -5,7 +5,8 @@ import { connect } from '@obsidians/redux'
 import Project, { DeployButton } from '@obsidians/project'
 
 DeployButton.defaultProps = {
-  skipEstimate: true
+  skipEstimate: true,
+  skipTranscation: true
 }
 
 class ProjectWithProps extends PureComponent {
