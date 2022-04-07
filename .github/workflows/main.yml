@@ -7,7 +7,7 @@ env:
   owner: ObsidianLabs
   own_components: bif-components
   share_components: electron-components
-  eth_components: eth_components
+  eth_components: eth-components
   project_build: eth
   project_project: bif
   project_name: BIF Studio
