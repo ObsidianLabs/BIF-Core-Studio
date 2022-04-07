@@ -15,7 +15,7 @@ env:
   enable_auth: true
   premium_editor: ../premium-editor
   cos_bucket: bif-studio-test-1303090311
-  cos_region: ap-singapore
+  cos_region: ap-nanjing
   dns_path: https://bif-studio.test.ide.black
 
 jobs:
