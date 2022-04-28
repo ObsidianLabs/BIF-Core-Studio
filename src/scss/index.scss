@@ -486,3 +486,7 @@ textarea {
 #toolbar-btn-navbar-refresh {
   background-color: $background2;
 }
+
+.tree-wrap .rc-tree .rc-tree-treenode.rc-tree-treenode-selected {
+  background-color: var(--color-bg) !important;
+}

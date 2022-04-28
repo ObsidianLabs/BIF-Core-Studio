@@ -97,8 +97,8 @@ const overrides = [
     '@obsidians/contract': `@obsidians/${process.env.BUILD}-contract`,
     '@obsidians/explorer': `@obsidians/${process.env.BUILD}-explorer`,
     '@obsidians/network': `@obsidians/${process.env.BUILD}-network`,
-    '@obsidians/sdk': `@obsidians/${process.env.PROJECT}-sdk`,
     '@obsidians/node': `@obsidians/${process.env.BUILD}-node`,
+    '@obsidians/sdk': `@obsidians/${process.env.BUILD}-sdk`,
     '@obsidians/premium-editor': path.resolve(
       __dirname,
       process.env.PREMIUM_EDITOR || 'empty.js'
@@ -114,12 +114,12 @@ const overrides = [
     PROJECT_WEB_URL: JSON.stringify('https://eth.ide.black'),
     PROJECT_DESKTOP_URL: JSON.stringify('https://app.obsidians.io/eth'),
     PROJECT_GITHUB_REPO: JSON.stringify(
-      'https://github.com/ObsidianLabs/BIF-Core-Studio'
+      'https://github.com/ObsidianLabs/Black-IDE'
     ),
     OS_IS_LINUX: JSON.stringify(os.type() === 'Linux'),
     OS_IS_WINDOWS: JSON.stringify(os.type() === 'Windows_NT'),
     OS_IS_MAC: JSON.stringify(os.type() === 'Darwin'),
-    CHAIN_NAME: '"BIF-Core"',
+    CHAIN_NAME: '"Ethereum"',
     CHAIN_SHORT_NAME: '"ETH"',
     CHAIN_EXECUTABLE_NAME: '"Geth"',
     CHAIN_EXECUTABLE_NAME_IN_LABEL: '"Geth"',
@@ -135,6 +135,9 @@ const overrides = [
     LANG: JSON.stringify(process.env.LANGUAGE || 'en'),
     ENABLE_AUTH: true,
     RENDER_LOGO: JSON.stringify(process.env.RENDER_LOGO || false),
+    BUILD_ID: process.env.BUILD_ID,
+    COMMIT_ID: JSON.stringify(process.env.COMMIT_ID),
+    BUILD_TIME: JSON.stringify(process.env.BUILD_TIME),
   }),
   turnOffMangle(),
   addWasmLoader(),
