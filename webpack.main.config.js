@@ -77,7 +77,7 @@ module.exports = merge.smart(baseConfig, {
       'process.env.PROJECT_NAME': JSON.stringify(process.env.PROJECT_NAME),
       'process.env.SERVER_URL': JSON.stringify(process.env.REACT_APP_SERVER_URL),
       'process.env.DOCKER_IMAGE_NODE': '"ethereum/client-go"',
-      'process.env.DOCKER_IMAGE_COMPILER': '"obsidians/truffle"',
+      'process.env.DOCKER_IMAGE_COMPILER': '"caictdevelop/bif-solidity"',
     })
   ]
 })
