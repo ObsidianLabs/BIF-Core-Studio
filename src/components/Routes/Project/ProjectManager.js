@@ -16,6 +16,17 @@ function makeProjectManager(Base) {
 			return projectAbis
 		}
 
+		async getDefaultContractFileNode() {
+      const settings = await this.checkSettings()
+      if (!settings?.deploy) {
+        return
+      }
+			console.log(111111)
+      const filePath = this.pathForProjectFile(settings.deploy)
+      const pathInProject = this.pathInProject(filePath)
+      return { path: filePath, pathInProject }
+    }
+
 		async deploy(contractFileNode) {
 			contractFileNode = contractFileNode || await this.getDefaultContractFileNode()
 			console.log(contractFileNode, 'bif-deploy')
@@ -25,12 +36,13 @@ function makeProjectManager(Base) {
 			console.log(abiName, 'abiName')
 			let bytecode
 			try {
-				bytecode = await fileOps.current.readFile(contractFileNode.path, 'hex')
+				console.log(contractFileNode)
+				bytecode = await fileOps.current.readFile(contractFileNode.path.replace('_meta.json','.bin'))
+				console.log(bytecode, 'bytecode')
 			} catch (e) {
 				notification.error('Deploy Error', e.message)
 				return
 			}
-			console.log(abiPath)
 			this.deployButton.getDeploymentParameters({
 				contractFileNode: {
 					path: abiPath,
@@ -66,6 +78,7 @@ function makeProjectManager(Base) {
 		}
 
 		buildContractObj(contractName, abi, bytecode) {
+			console.log(bytecode, 'buildContractObj')
 			return {
 				contractName,
 				abi,
@@ -75,7 +88,7 @@ function makeProjectManager(Base) {
 		}
 
 		validateDeployment(contractObj) {
-
+			console.log(contractObj, 'validateDeployment')
 			if (contractObj.vmType) {
 				return {
 					abi: contractObj.abi,
