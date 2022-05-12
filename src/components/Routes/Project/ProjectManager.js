@@ -19,9 +19,10 @@ function makeProjectManager(Base) {
 		async deploy(contractFileNode) {
 			contractFileNode = contractFileNode || await this.getDefaultContractFileNode()
 			console.log(contractFileNode, 'bif-deploy')
-			const abiPath = contractFileNode.path.replace('.wasm', '.abi.json')
+			// solidity contract
+			const abiPath = contractFileNode.path
 			const abiName = fileOps.current.path.parse(abiPath).base
-
+			console.log(abiName, 'abiName')
 			let bytecode
 			try {
 				bytecode = await fileOps.current.readFile(contractFileNode.path, 'hex')
@@ -29,15 +30,18 @@ function makeProjectManager(Base) {
 				notification.error('Deploy Error', e.message)
 				return
 			}
-
+			console.log(abiPath)
 			this.deployButton.getDeploymentParameters({
 				contractFileNode: {
 					path: abiPath,
 					pathInProject: contractFileNode.pathInProject,
 				},
-				contracts: [abiName],
+				contracts: [{
+					path:  abiPath,
+					pathInProject: contractFileNode.pathInProject,
+				}],
 				getConstructorAbiArgs: contractObj => {
-					console.log(1231231231, contractObj)
+					console.log(contractObj, '123123')
 					return [
 						contractObj.output.abi.map(item => {
 							return {
