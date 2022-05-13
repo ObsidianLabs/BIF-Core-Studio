@@ -7,7 +7,7 @@ import Welcome, { checkDependencies } from '@obsidians/welcome'
 import { GlobalModals, autoUpdater } from '@obsidians/global'
 import { LoadingScreen } from '@obsidians/ui-components'
 import redux, { Provider } from '@obsidians/redux'
-
+import compiler from '@obsidians/compiler'
 import { config, updateStore } from '@/redux'
 import '@/menu'
 
@@ -15,13 +15,37 @@ import Routes from './components/Routes'
 import icon from './components/icon.png'
 const Header = lazy(() => import('./components/Header' /* webpackChunkName: "header" */))
 
+Welcome.defaultProps = {
+  hasNode: false,
+  overrideItems: [
+    {
+      channel: compiler.solc,
+      title: `${process.env.COMPILER_NAME} in Docker`,
+      subtitle: `${process.env.CHAIN_NAME} version of truffle used to create and compile a project.`,
+      link: `https://hub.docker.com/r/${process.env.DOCKER_IMAGE_COMPILER}`,
+      downloadingTitle: `Downloading ${process.env.COMPILER_NAME}`,
+    },
+    {
+      channel: compiler.cdt,
+      title: 'BIF-WASM-CDT',
+      subtitle: '将 C++ 合约文件编译成对应的 wasm 和 abi 文件',
+      downloadingTitle: `Downloading BIF-WASM-CDT`,
+    },
+    {
+      channel: compiler.abi,
+      title: 'BIF-WASM-ABI',
+      subtitle: '将生成的对应 abi 文件编码成 abicode',
+      downloadingTitle: `Downloading BIF-WASM-ABI`,
+    }
+  ]
+}
 export default class ReduxApp extends Component {
   state = {
     loaded: false,
     dependencies: false
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     await redux.init(config, updateStore).then(onReduxLoaded)
     this.refresh()
   }
@@ -36,7 +60,7 @@ export default class ReduxApp extends Component {
     this.setState({ loaded: true, dependencies: true })
   }
 
-  render () {
+  render() {
     if (!this.state.loaded) {
       return <LoadingScreen />
     }
@@ -71,7 +95,7 @@ export default class ReduxApp extends Component {
   }
 }
 
-async function onReduxLoaded () {
+async function onReduxLoaded() {
   Auth.restore()
   const version = await fileOps.current.getAppVersion()
   redux.dispatch('SET_VERSION', { version })

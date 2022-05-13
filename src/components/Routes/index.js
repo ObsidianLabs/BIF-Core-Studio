@@ -4,8 +4,9 @@ import CacheRoute, { CacheSwitch } from 'react-router-cache-route'
 
 import Auth from '@obsidians/auth'
 import { Input, LoadingScreen, CenterScreen } from '@obsidians/ui-components'
-
+import { NewProjectModal } from '@obsidians/project'
 import BottomBar from './BottomBar'
+import FrameworkSelector from './Project/FrameworkSelector'
 
 Input.defaultProps = {
   type: 'text',
@@ -15,12 +16,49 @@ Input.defaultProps = {
   spellCheck: 'false'
 }
 
+NewProjectModal.defaultProps = {
+  // noCompilerOption: true,
+  defaultFramework: 'alaya-truffle-docker',
+  FrameworkSelector,
+  templates: [
+    {
+      group: `cpp`,
+      badge: `C++`,
+      children: [
+        { id: 'cpp-counter', display: 'Counter' },
+      ],
+    },
+    {
+      group: `solidity`,
+      badge: `Solidity`,
+      children: [
+        { id: 'sol-counter', display: 'Counter' },
+      ],
+    },
+    {
+      group: `go`,
+      badge: `Go`,
+      children: [
+        { id: 'go-counter', display: 'Counter' },
+      ],
+    },
+    {
+      group: `java`,
+      badge: `Java`,
+      children: [
+        { id: 'java-counter', display: 'Counter' },
+        { id: 'java-erc20', display: 'ERC20' },
+      ],
+    },
+  ]
+}
+
 const UserHomepage = lazy(() => import('./UserHomepage' /* webpackChunkName: "Homepage" */))
 const Project = lazy(() => import('./Project' /* webpackChunkName: "Project" */))
 const Contract = lazy(() => import('./Contract' /* webpackChunkName: "Contract" */))
 const Explorer = lazy(() => import('./Explorer' /* webpackChunkName: "Explorer" */))
 const Network = lazy(() => import('./Network' /* webpackChunkName: "Network" */))
-console.log(Network)
+
 export default function (props) {
   return (
     <>
