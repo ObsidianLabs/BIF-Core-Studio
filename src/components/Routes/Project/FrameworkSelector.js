@@ -1,12 +1,10 @@
 import React, { PureComponent } from 'react'
-
 import {
   FormGroup,
   Label,
   ButtonOptions,
   DropdownInput,
 } from '@obsidians/ui-components'
-
 import notification from '@obsidians/notification'
 import { DockerImageInputSelector } from '@obsidians/docker'
 import compilerManager from '@obsidians/compiler'
@@ -99,9 +97,6 @@ export default class FrameworkSelector extends PureComponent {
     const { framework, group, onSelectFramework } = this.props
 
     const options = [{ key: 'alaya-truffle-docker', text: frameworkNames['alaya-truffle-docker'] }]
-    // if (group !== process.env.COMPILER_NAME) {
-    //   options.unshift({ key: 'alaya-truffle', text: frameworkNames['alaya-truffle'] })
-    // }
 
     return (
       <div className='row'>

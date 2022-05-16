@@ -29,10 +29,13 @@ NewProjectModal.defaultProps = {
     //   ],
     // },
     {
+
+    },
+    {
       group: `solidity`,
       badge: `Solidity`,
       children: [
-        { id: 'sol-counter', display: 'Counter' },
+        { id: 'coin', display: 'Coin' },
       ],
     },
     // {
