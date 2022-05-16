@@ -160,6 +160,9 @@
       {
         "provider": "generic",
         "url": "http://www.obsidians.io"
+      },
+      {
+        "provider": "github"
       }
     ],
     "directories": {
