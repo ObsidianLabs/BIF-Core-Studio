@@ -1,28 +1,85 @@
-name: Build Web
+name: Build Main
 
 on:
+  push:
+    branches:
+      - develop
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 env:
   owner: ObsidianLabs
   own_components: bif-components
-  share_components: electron-components
   eth_components: eth-components
+  share_components: electron-components
   project_build: eth
-  project_project: bif
-  project_name: BIF Studio
-  project_build_script: yarn && PUBLIC_URL=/ CDN=true yarn build:react
-  enable_auth: true
+  project_project: eth
+  project_name: BIF Core Studio
+  project_build_script: yarn && REACT_APP_ENV=development yarn dist
+  os_matrix: '[\"macos-latest\", \"ubuntu-18.04\", \"windows-2019\"]'
+  enable_auth: false
   premium_editor: ../premium-editor
-  cos_bucket: bif-studio-test-1303090311
-  cos_region: ap-nanjing
-  dns_path: https://bif-studio.test.ide.black
+  GH_TOKEN: ${{ secrets.obsidians_token }}
 
 jobs:
-  # Build and release
-  release:
+  build-info:
     runs-on: ubuntu-18.04
     steps:
+      - name: Get ${{ env.project_name }}'s build info
+        id: build-info
+        shell: bash
+        run: |
+          echo ::set-output name=BRANCH::${GITHUB_REF##*/}
+          if [[ ${{ github.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo ::set-output name=NEW_RELEASE::true
+            echo ::set-output name=BRANCH::master
+            echo "project_build_script=yarn && yarn dist" >> $GITHUB_ENV
+          fi
+    outputs:
+      branch: ${{ steps.build-info.outputs.BRANCH }}
+      new_release: ${{ steps.build-info.outputs.NEW_RELEASE}}
+
+  # Generate matrix for the following steps
+  generate-matrix:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - name: Generate os matrix
+        id: set-os-matrix
+        run: echo ::set-output name=os::${{ env.os_matrix }}
+
+      - name: Generate component matrix
+        id: set-component-matrix
+        run: echo ::set-output name=component::[\"${{ env.own_components }}\", \"${{ env.share_components }}\"]
+
+    outputs:
+      os: ${{ steps.set-os-matrix.outputs.os }}
+
+  # Build and release
+  build:
+    needs: [generate-matrix, build-info]
+
+    strategy:
+      matrix:
+        os: ${{ fromJson(needs.generate-matrix.outputs.os) }}
+
+    runs-on: ${{ matrix.os }}
+
+    outputs:
+      version: ${{ steps.extract_version.outputs.version }}
+
+    steps:
+      - name: Override Build Script
+        shell: bash
+        run: |
+          if [[ "${{ github.ref }}" != "refs/heads/master" ]]; then
+            echo "project_build_script=yarn && yarn dist:staging" >> $GITHUB_ENV
+          fi
+          if [[ ${{ github.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo "project_build_script=yarn && yarn dist --publish always" >> $GITHUB_ENV
+          fi
+
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v1
         with:
@@ -33,9 +90,17 @@ jobs:
         with:
           repository: ${{ env.owner }}/${{ env.share_components }}
           ref: bif
-          path: ./${{ env.share_components }}
+          path: ${{ env.share_components }}
           token: ${{ secrets.obsidians_token }}
 
+      - name: Checkout ${{ env.own_components }}
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.owner }}/${{ env.own_components }}
+          ref: feat/add-bif-packages
+          path: ${{ env.own_components }}
+          token: ${{ secrets.obsidians_token }}
+          
       - name: Checkout ${{ env.eth_components }}
         uses: actions/checkout@v2
         with:
@@ -43,39 +108,37 @@ jobs:
           ref: bif
           path: ./${{ env.eth_components }}
           token: ${{ secrets.obsidians_token }}
-  
-      - name: Checkout ${{ env.own_components }}
-        uses: actions/checkout@v2
-        with:
-          repository: ${{ env.owner }}/${{ env.own_components }}
-          ref: feat/add-bif-packages
-          path: ./${{ env.own_components }}
-          token: ${{ secrets.obsidians_token }}
 
       - name: Checkout Premium Editor
         uses: actions/checkout@v2
         with:
           repository: ${{ env.owner }}/premium-editor
-          ref: develop
-          path: ./premium-editor
+          ref: ${{ needs.build-info.outputs.branch }}
+          path: premium-editor
           token: ${{ secrets.obsidians_token }}
 
       - name: Checkout ${{ env.project_name }}
         uses: actions/checkout@v2
         with:
           ref: feat/update-bif-studio
-          path: ./studio
+          path: studio
+
+      - name: Extract version
+        id: extract_version
+        uses: Saionaro/extract-package-version@v1.1.1
+        with:
+          path: studio
 
       - name: Install ${{ env.share_components }} submodule
-        working-directory: ./${{ env.share_components }}
+        working-directory: ${{ env.share_components }}
         run: git submodule update --init
 
       - name: Install ${{ env.share_components }} dependencies
-        working-directory: ./${{ env.share_components }}
+        working-directory: ${{ env.share_components }}
         run: yarn
 
       - name: Build ${{ env.share_components }}
-        working-directory: ./${{ env.share_components }}
+        working-directory: ${{ env.share_components }}
         run: yarn build
 
       - name: Install ${{ env.eth_components }} submodule
@@ -91,33 +154,33 @@ jobs:
         run: yarn build
 
       - name: Install ${{ env.own_components }} submodule
-        working-directory: ./${{ env.own_components }}
+        working-directory: ${{ env.own_components }}
         run: git submodule update --init
 
       - name: Install ${{ env.own_components }} dependencies
-        working-directory: ./${{ env.own_components }}
+        working-directory: ${{ env.own_components }}
         run: yarn
 
       - name: Build ${{ env.own_components }}
-        working-directory: ./${{ env.own_components }}
+        working-directory: ${{ env.own_components }}
         run: yarn build
 
       - name: Install Premium Editor dependencies
-        working-directory: ./premium-editor
+        working-directory: premium-editor
         run: yarn
 
       - name: Build Premium Editor
-        working-directory: ./premium-editor
+        working-directory: premium-editor
         run: yarn build
 
-      - name: Build ${{ env.project_name }}
+      - name: Build ${{ env.project_name }}-${{ steps.extract_version.outputs.version }}
         uses: ObsidianLabs/studio-build-action@master
         with:
           build: ${{ env.project_build }}
           project: ${{ env.project_project }}
           project_name: ${{ env.project_name }}
           build_script: ${{ env.project_build_script }}
-          working-directory: ./studio
+          working-directory: studio
           enable_auth: ${{ env.enable_auth }}
           fontawesome_token: ${{ secrets.fontawesome_token }}
           mac_certs: ${{ secrets.certs }}
@@ -126,31 +189,4 @@ jobs:
           windows_certs_password: ${{ secrets.certs_password }}
           react_app_mixpanel_token: ${{ secrets.react_app_mixpanel_token }}
           premium_editor: ${{ env.premium_editor }}
-          github_token: ${{ github.token }}
-          build_id: ${{ github.run_id }}
-          build_time: ${{ github.updated_at }}
-          commit_id: ${{ github.sha }}
-
-      - name: Create a placeholder for COS
-        run: echo cos > ./.placeholder
-
-      - name: Upload ${{ env.project_name }} to COS
-        uses: zkqiang/tencent-cos-action@v0.1.0
-        with:
-          args: upload ./.placeholder / && delete -r -f / && upload -r ./studio/build/ /
-          secret_id: ${{ secrets.tencent_cloud_secretid }}
-          secret_key: ${{ secrets.tencent_cloud_secretkey }}
-          bucket: ${{ env.cos_bucket }}
-          region: ${{ env.cos_region }}
-
-      - name: Flush ${{ env.project_name }} CDN
-        uses: TencentCloud/cli-action@v1
-        with:
-          secret_id: ${{ secrets.tencent_cloud_secretId }}
-          secret_key: ${{ secrets.tencent_cloud_secretKey }}
-          # Tencent Cloud product region
-          region: ${{ env.cos_region }}
-          # Tencent Cloud CLI commands. Mult commands seperate by `&&`
-          commands: 'cdn PurgePathCache --cli-unfold-argument --Paths ${{ env.dns_path }} --FlushType flush'
-          # Data format of command output. Available values are `json`, `table`, `text`. Default is `json`
-          output_format: 'json'
+          github_token: ${{ secrets.obsidians_token }}
