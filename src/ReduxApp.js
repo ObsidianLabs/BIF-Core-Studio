@@ -15,31 +15,33 @@ import Routes from './components/Routes'
 import icon from './components/icon.png'
 const Header = lazy(() => import('./components/Header' /* webpackChunkName: "header" */))
 
+const overrideItems = [
+  {
+    channel: compiler.solc,
+    title: `${process.env.COMPILER_NAME} in Docker`,
+    subtitle: `${process.env.CHAIN_NAME} version of truffle used to create and compile a project.`,
+    link: `https://hub.docker.com/r/${process.env.DOCKER_IMAGE_COMPILER}`,
+    downloadingTitle: `Downloading ${process.env.COMPILER_NAME}`,
+  },
+  {
+    channel: compiler.cdt,
+    title: 'BIF-WASM-CDT',
+    subtitle: '将 C++ 合约文件编译成对应的 wasm 和 abi 文件',
+    link: `https://hub.docker.com/r/${process.env.DOCKER_IMAGE_COMPILER}`,
+    downloadingTitle: `Downloading BIF-WASM-CDT`,
+  },
+  {
+    channel: compiler.abi,
+    title: 'BIF-WASM-ABI',
+    subtitle: '将生成的对应 abi 文件编码成 abicode',
+    link: `https://hub.docker.com/r/${process.env.DOCKER_IMAGE_COMPILER}`,
+    downloadingTitle: `Downloading BIF-WASM-ABI`,
+  }
+]
+
 Welcome.defaultProps = {
   hasNode: false,
-  overrideItems: [
-    {
-      channel: compiler.solc,
-      title: `${process.env.COMPILER_NAME} in Docker`,
-      subtitle: `${process.env.CHAIN_NAME} version of truffle used to create and compile a project.`,
-      link: `https://hub.docker.com/r/${process.env.DOCKER_IMAGE_COMPILER}`,
-      downloadingTitle: `Downloading ${process.env.COMPILER_NAME}`,
-    },
-    // {
-    //   channel: compiler.solc,
-    //   title: 'BIF-WASM-CDT',
-    //   subtitle: '将 C++ 合约文件编译成对应的 wasm 和 abi 文件',
-    //   link: `https://hub.docker.com/r/${process.env.DOCKER_IMAGE_COMPILER}`,
-    //   downloadingTitle: `Downloading BIF-WASM-CDT`,
-    // },
-    // {
-    //   channel: compiler.abi,
-    //   title: 'BIF-WASM-ABI',
-    //   subtitle: '将生成的对应 abi 文件编码成 abicode',
-    //   link: `https://hub.docker.com/r/${process.env.DOCKER_IMAGE_COMPILER}`,
-    //   downloadingTitle: `Downloading BIF-WASM-ABI`,
-    // }
-  ]
+  overrideItems
 }
 export default class ReduxApp extends Component {
   state = {
@@ -52,8 +54,13 @@ export default class ReduxApp extends Component {
     this.refresh()
   }
 
+  componentDidUpdate(prevProps) {
+    console.log(prevProps)
+  }
+
   refresh = async () => {
-    const dependencies = await checkDependencies()
+    const dependencies = await checkDependencies(overrideItems)
+    console.log(dependencies, 'refresh')
     this.setState({ loaded: true, dependencies })
     autoUpdater.check()
   }

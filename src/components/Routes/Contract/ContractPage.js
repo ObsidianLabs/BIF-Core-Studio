@@ -3,7 +3,6 @@ import { ContractPage } from '@obsidians/contract'
 
 export default class PlatonContractPage extends ContractPage {
 	getAbiData (codeHash) {
-		console.log(codeHash, 'codeHash')
     const abiData = redux.getState().abis.get(codeHash)?.toJS()
 		console.log(abiData, 'abiData')
     if (!abiData) {
