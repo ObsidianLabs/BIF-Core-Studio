@@ -25,18 +25,20 @@ Welcome.defaultProps = {
       link: `https://hub.docker.com/r/${process.env.DOCKER_IMAGE_COMPILER}`,
       downloadingTitle: `Downloading ${process.env.COMPILER_NAME}`,
     },
-    {
-      channel: compiler.cdt,
-      title: 'BIF-WASM-CDT',
-      subtitle: '将 C++ 合约文件编译成对应的 wasm 和 abi 文件',
-      downloadingTitle: `Downloading BIF-WASM-CDT`,
-    },
-    {
-      channel: compiler.abi,
-      title: 'BIF-WASM-ABI',
-      subtitle: '将生成的对应 abi 文件编码成 abicode',
-      downloadingTitle: `Downloading BIF-WASM-ABI`,
-    }
+    // {
+    //   channel: compiler.solc,
+    //   title: 'BIF-WASM-CDT',
+    //   subtitle: '将 C++ 合约文件编译成对应的 wasm 和 abi 文件',
+    //   link: `https://hub.docker.com/r/${process.env.DOCKER_IMAGE_COMPILER}`,
+    //   downloadingTitle: `Downloading BIF-WASM-CDT`,
+    // },
+    // {
+    //   channel: compiler.abi,
+    //   title: 'BIF-WASM-ABI',
+    //   subtitle: '将生成的对应 abi 文件编码成 abicode',
+    //   link: `https://hub.docker.com/r/${process.env.DOCKER_IMAGE_COMPILER}`,
+    //   downloadingTitle: `Downloading BIF-WASM-ABI`,
+    // }
   ]
 }
 export default class ReduxApp extends Component {
