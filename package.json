@@ -1,7 +1,7 @@
 {
-  "name": "black-ide",
+  "name": "bif-core-studio",
   "description": "Graphic IDE for Ethereum smart contract development",
-  "version": "0.15.2",
+  "version": "0.1.3",
   "author": {
     "name": "Phil Li",
     "email": "phil.li@obsidians.io",
@@ -150,8 +150,8 @@
     ]
   },
   "build": {
-    "productName": "Black IDE",
-    "artifactName": "Black-IDE-${version}.${ext}",
+    "productName": "BIF-Core Studio",
+    "artifactName": "BIF-Core-Studio-${version}.${ext}",
     "files": [
       "build/**/*",
       "node_modules/**/*"
