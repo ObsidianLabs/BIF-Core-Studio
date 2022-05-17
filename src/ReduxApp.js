@@ -19,7 +19,7 @@ const overrideItems = [
   {
     channel: compiler.solc,
     title: `${process.env.COMPILER_NAME} in Docker`,
-    subtitle: `${process.env.CHAIN_NAME} version of truffle used to create and compile a project.`,
+    subtitle: `${process.env.CHAIN_NAME} version of compiler to compile a project.`,
     link: `https://hub.docker.com/r/${process.env.DOCKER_IMAGE_COMPILER}`,
     downloadingTitle: `Downloading ${process.env.COMPILER_NAME}`,
   },

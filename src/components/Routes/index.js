@@ -18,18 +18,16 @@ Input.defaultProps = {
 
 NewProjectModal.defaultProps = {
   // noCompilerOption: true,
+  defaultTemplate: 'coin',
   defaultFramework: 'alaya-truffle-docker',
   FrameworkSelector,
   templates: [
-    // {
-    //   group: `cpp`,
-    //   badge: `C++`,
-    //   children: [
-    //     { id: 'cpp-counter', display: 'Counter' },
-    //   ],
-    // },
     {
-
+      group: `cpp`,
+      badge: `C++`,
+      children: [
+        { id: 'cpp-helloworld', display: 'helloworld' },
+      ],
     },
     {
       group: `solidity`,
