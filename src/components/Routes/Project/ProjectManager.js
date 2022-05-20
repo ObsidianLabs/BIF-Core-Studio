@@ -28,8 +28,22 @@ function makeProjectManager(Base) {
     }
 
 		async deploy(contractFileNode) {
+			console.log(contractFileNode, 'contractFileNode')
 			contractFileNode = contractFileNode || await this.getDefaultContractFileNode()
-			
+			console.log(contractFileNode)
+			if (contractFileNode?.path?.endsWith('.wasm')) {
+				const abiPath = contractFileNode.path.replace('.wasm', '.abi')
+        const abiName = fileOps.current.path.parse(abiPath).base
+				let bytecode
+				try {
+					bytecode = await fileOps.current.readFile(contractFileNode.path.replace('.json','.bin'))
+					console.log(bytecode)
+				} catch (e) {
+					notification.error('Deploy Error', e.message)
+					return
+				}
+
+			}
 			// solidity contract
 			const abiPath = contractFileNode.path
 			const abiName = fileOps.current.path.parse(abiPath).base
@@ -41,6 +55,7 @@ function makeProjectManager(Base) {
 				return
 			}
 
+			console.log(bytecode, 'bytecode')
 			this.deployButton.getDeploymentParameters({
 				contractFileNode: {
 					path: abiPath,
