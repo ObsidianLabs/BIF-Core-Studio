@@ -32,45 +32,46 @@ function makeProjectManager(Base) {
 			if (contractFileNode?.path?.endsWith('.wasm')) {
 				const abiPath = contractFileNode.path.replace('.wasm', '.abi')
 				// const abiName = fileOps.current.path.parse(abiPath).base
+				let bytecode
 				const buffer = []
 				try {
 					console.log(contractFileNode.path, 'contractFileNode.path')
-					const content = await fileOps.current.readFile(contractFileNode.path.replace('.wasm', '.bin'))
-					const arr = Uint8Array.from(content)
-					arr.forEach(n => buffer.push(String.fromCharCode(n)))
-					const bin = buffer.join('')
-					console.log(bin, 'bin')
+					bytecode = await fileOps.current.readFile(contractFileNode.path.replace('.wasm', '.bin'), 'hex')
+					// const arr = Uint8Array.from(content)
+					// arr.forEach(n => buffer.push(String.fromCharCode(n)))
+					// const bin = buffer.join('')
+					// console.log(content, 'bin')
 				} catch (e) {
 					notification.error('Deploy Error', e.message)
 					return
 				}
 
-				// this.deployButton.getDeploymentParameters({
-				// 	contractFileNode: {
-				// 		path: abiPath,
-				// 		pathInProject: contractFileNode.pathInProject,
-				// 	},
-				// 	contracts: [{
-				// 		path: abiPath,
-				// 		pathInProject: contractFileNode.pathInProject,
-				// 	}],
-				// 	getConstructorAbiArgs: contractObj => {
-				// 		return [
-				// 			contractObj.output.abi.map(item => {
-				// 				return {
-				// 					...item,
-				// 					inputs: item.input,
-				// 					type: item.type === 'Action' ? 'function' : '',
-				// 					stateMutability: item.constant ? 'view' : ''
-				// 				}
-				// 			}),
-				// 			{ key: 'name', value: 'init' }
-				// 		]
-				// 	}
-				// },
-				// 	(abi, allParameters) => this.pushDeployment(this.buildContractObj(allParameters.contractName, abi, bytecode), allParameters),
-				// 	(abi, allParameters) => this.estimate(this.buildContractObj(allParameters.contractName, abi, bytecode), allParameters)
-				// )
+				this.deployButton.getDeploymentParameters({
+					contractFileNode: {
+						path: abiPath,
+						pathInProject: contractFileNode.pathInProject,
+					},
+					contracts: [{
+						path: abiPath,
+						pathInProject: contractFileNode.pathInProject,
+					}],
+					getConstructorAbiArgs: contractObj => {
+						return [
+							contractObj.output.abi.map(item => {
+								return {
+									...item,
+									inputs: item.input,
+									type: item.type === 'Action' ? 'function' : '',
+									stateMutability: item.constant ? 'view' : ''
+								}
+							}),
+							{ key: 'name', value: 'init' }
+						]
+					}
+				},
+					(abi, allParameters) => this.pushDeployment(this.buildContractObj(allParameters.contractName, abi, bytecode), allParameters),
+					(abi, allParameters) => this.estimate(this.buildContractObj(allParameters.contractName, abi, bytecode), allParameters)
+				)
 
 			} else {
 				// solidity contract
