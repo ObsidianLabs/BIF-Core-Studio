@@ -22,13 +22,13 @@ NewProjectModal.defaultProps = {
   defaultFramework: 'alaya-truffle-docker',
   FrameworkSelector,
   templates: [
-    // {
-    //   group: `cpp`,
-    //   badge: `C++`,
-    //   children: [
-    //     { id: 'cpp-helloworld', display: 'helloworld' },
-    //   ],
-    // },
+    {
+      group: `cpp`,
+      badge: `C++`,
+      children: [
+        { id: 'cpp-helloworld', display: 'helloworld' },
+      ],
+    },
     {
       group: `solidity`,
       badge: `Solidity`,
