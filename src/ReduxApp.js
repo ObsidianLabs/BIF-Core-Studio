@@ -17,7 +17,7 @@ const Header = lazy(() => import('./components/Header' /* webpackChunkName: "hea
 
 const overrideItems = [
   {
-    channel: compiler.solc,
+    channel: compiler.bif,
     title: `${process.env.COMPILER_NAME} in Docker`,
     subtitle: `${process.env.CHAIN_NAME} version of compiler to compile a project.`,
     link: `https://hub.docker.com/r/${process.env.DOCKER_IMAGE_COMPILER}`,
