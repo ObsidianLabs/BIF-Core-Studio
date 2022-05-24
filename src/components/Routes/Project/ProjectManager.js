@@ -29,14 +29,17 @@ function makeProjectManager(Base) {
 
 		async deploy(contractFileNode) {
 			contractFileNode = contractFileNode || await this.getDefaultContractFileNode()
+			console.log(contractFileNode, 'contractFileNode')
 			if (contractFileNode?.path?.endsWith('.wasm')) {
 				const abiPath = contractFileNode.path.replace('.wasm', '.abi')
 				// const abiName = fileOps.current.path.parse(abiPath).base
-				let bytecode
-				const buffer = []
+				let base64Content
 				try {
 					console.log(contractFileNode.path, 'contractFileNode.path')
-					bytecode = await fileOps.current.readFile(contractFileNode.path.replace('.wasm', '.bin'), 'hex')
+					const bytecode = await fileOps.current.readFile(contractFileNode.path)
+					const buff = new Buffer(bytecode);
+					base64Content = buff.toString('base64')
+					console.log(base64Content)
 					// const arr = Uint8Array.from(content)
 					// arr.forEach(n => buffer.push(String.fromCharCode(n)))
 					// const bin = buffer.join('')
@@ -56,6 +59,7 @@ function makeProjectManager(Base) {
 						pathInProject: contractFileNode.pathInProject,
 					}],
 					getConstructorAbiArgs: contractObj => {
+						console.log(contractObj, 'getConstructorAbiArgs')
 						return [
 							contractObj.output.abi.map(item => {
 								return {
@@ -69,8 +73,8 @@ function makeProjectManager(Base) {
 						]
 					}
 				},
-					(abi, allParameters) => this.pushDeployment(this.buildContractObj(allParameters.contractName, abi, bytecode), allParameters),
-					(abi, allParameters) => this.estimate(this.buildContractObj(allParameters.contractName, abi, bytecode), allParameters)
+					(abi, allParameters) => this.pushDeployment(this.buildCppContractObj(allParameters.contractName, abi, base64Content, base64Content), allParameters),
+					(abi, allParameters) => this.estimate(this.buildCppContractObj(allParameters.contractName, abi, base64Content, base64Content), allParameters)
 				)
 
 			} else {
@@ -116,8 +120,17 @@ function makeProjectManager(Base) {
 
 		}
 
+		buildCppContractObj(contractName, abi, bytecode, base64Content) {
+			return {
+				contractName,
+				abi,
+				bytecode,
+				payLoad: base64Content,
+				vmType: 2,
+			}
+		}
+
 		buildContractObj(contractName, abi, bytecode) {
-			console.log(bytecode, 'bytecode')
 			return {
 				contractName,
 				abi,
