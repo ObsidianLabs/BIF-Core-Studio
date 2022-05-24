@@ -29,7 +29,6 @@ function makeProjectManager(Base) {
 
 		async deploy(contractFileNode) {
 			contractFileNode = contractFileNode || await this.getDefaultContractFileNode()
-			console.log(contractFileNode, 'contractFileNode')
 			if (contractFileNode?.path?.endsWith('.wasm')) {
 				const abiPath = contractFileNode.path.replace('.wasm', '.abi')
 				// const abiName = fileOps.current.path.parse(abiPath).base
@@ -89,7 +88,6 @@ function makeProjectManager(Base) {
 					return
 				}
 
-				console.log(bytecode, 'bytecode')
 				this.deployButton.getDeploymentParameters({
 					contractFileNode: {
 						path: abiPath,
@@ -121,11 +119,12 @@ function makeProjectManager(Base) {
 		}
 
 		buildCppContractObj(contractName, abi, bytecode, base64Content) {
+			console.log(base64Content)
 			return {
 				contractName,
 				abi,
-				bytecode,
-				payLoad: base64Content,
+				bytecode: base64Content,
+				payload: base64Content,
 				vmType: 2,
 			}
 		}
