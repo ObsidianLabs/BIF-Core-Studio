@@ -1,7 +1,6 @@
 import notification from '@obsidians/notification'
 import fileOps from '@obsidians/file-ops'
 import { ProjectManager } from '@obsidians/project'
-const b64 = require('base64-wasm')
 
 function makeProjectManager(Base) {
 	return class ProjectManager extends Base {
@@ -63,7 +62,6 @@ function makeProjectManager(Base) {
 						pathInProject: contractFileNode.pathInProject,
 					}],
 					getConstructorAbiArgs: contractObj => {
-						console.log(contractObj, 'getConstructorAbiArgs')
 						return [
 							contractObj.output.abi.map(item => {
 								return {
