@@ -1,6 +1,7 @@
 {
-  "name": "bif-core-studio",
-  "description": "Graphic IDE for Ethereum smart contract development",
+
+  "name": "BIF-Core-Studio",
+  "description": "",
   "version": "0.1.10",
   "author": {
     "name": "Phil Li",
