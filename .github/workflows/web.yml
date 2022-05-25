@@ -14,8 +14,8 @@ env:
   project_build_script: yarn && PUBLIC_URL=/ CDN=true yarn build:react
   enable_auth: true
   premium_editor: ../premium-editor
-  cos_bucket: bif-studio-test-1303090311
-  cos_region: ap-nanjing
+  cos_bucket: bif-studio-test2-1303090311
+  cos_region: ap-singapore
   dns_path: https://bif-studio.test.ide.black
 
 jobs:
