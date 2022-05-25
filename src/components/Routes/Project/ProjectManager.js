@@ -1,6 +1,7 @@
 import notification from '@obsidians/notification'
 import fileOps from '@obsidians/file-ops'
 import { ProjectManager } from '@obsidians/project'
+const b64 = require('base64-wasm')
 
 function makeProjectManager(Base) {
 	return class ProjectManager extends Base {
@@ -36,8 +37,12 @@ function makeProjectManager(Base) {
 				try {
 					console.log(contractFileNode.path, 'contractFileNode.path')
 					const bytecode = await fileOps.current.readFile(contractFileNode.path)
-					const buff = new Buffer(bytecode);
-					base64Content = buff.toString('base64')
+					console.log(bytecode)
+					base64Content = btoa(
+						encodeURIComponent(bytecode).replace(/%([0-9A-F]{2})/g, function (match, p1) {
+							return String.fromCharCode("0x" + p1);
+						})
+					)
 					console.log(base64Content)
 					// const arr = Uint8Array.from(content)
 					// arr.forEach(n => buffer.push(String.fromCharCode(n)))
@@ -72,8 +77,8 @@ function makeProjectManager(Base) {
 						]
 					}
 				},
-					(abi, allParameters) => this.pushDeployment(this.buildCppContractObj(allParameters.contractName, abi, base64Content, base64Content), allParameters),
-					(abi, allParameters) => this.estimate(this.buildCppContractObj(allParameters.contractName, abi, base64Content, base64Content), allParameters)
+					(abi, allParameters) => this.pushDeployment(this.buildCppContractObj(allParameters.contractName, null, base64Content, base64Content), allParameters),
+					(abi, allParameters) => this.estimate(this.buildCppContractObj(allParameters.contractName, null, base64Content, base64Content), allParameters)
 				)
 
 			} else {
