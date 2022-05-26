@@ -2,8 +2,6 @@ name: Build Main
 
 on:
   push:
-    branches:
-      - develop
     tags:
       - 'v*'
   workflow_dispatch:
@@ -120,7 +118,7 @@ jobs:
       - name: Checkout ${{ env.project_name }}
         uses: actions/checkout@v2
         with:
-          ref: feat/update-bif-studio
+          ref: develop
           path: studio
 
       - name: Extract version
