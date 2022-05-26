@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-
+import platform from '@obsidians/platform'
 import { connect } from '@obsidians/redux'
 
 import headerActions, { Header, NavGuard } from '@obsidians/header'
@@ -9,6 +9,10 @@ import keypairManager, { KeypairInputSelector } from '@obsidians/keypair'
 
 import { List } from 'immutable'
 import ConfluxSdk from '@obsidians/bif-sdk'
+
+Header.defaultProps = {
+  noUser: !platform.isWeb
+}
 
 const extraContractItems = [
   { header: 'internal contracts' },
