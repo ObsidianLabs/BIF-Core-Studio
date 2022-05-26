@@ -12,7 +12,7 @@ env:
   eth_components: eth-components
   share_components: electron-components
   project_build: eth
-  project_project: eth
+  project_project: bif
   project_name: BIF Core Studio
   project_build_script: yarn && REACT_APP_ENV=development yarn dist
   os_matrix: '[\"macos-latest\", \"ubuntu-18.04\", \"windows-2019\"]'
