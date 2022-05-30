@@ -1,8 +1,17 @@
-import { BaseUserHomepage } from '@obsidians/user'
+import { BaseUserHomepage, UserProfile } from '@obsidians/user'
 import { connect } from '@obsidians/redux'
 import { networkManager } from '@obsidians/network'
+import platform from '@obsidians/platform'
 
-class UserHomepage extends BaseUserHomepage {
+BaseUserHomepage.defaultProps = {
+  noUser: !platform.isWeb
+}
+
+UserProfile.defaultProps = {
+  noUser: true
+}
+
+class Homepage extends BaseUserHomepage {
   componentDidMount (props) {
     super.componentDidMount(props)
     if (process.env.DEPLOY === 'bsn') {
@@ -34,4 +43,4 @@ class UserHomepage extends BaseUserHomepage {
   }
 }
 
-export default connect(['profile', 'projects'])(UserHomepage)
+export default connect(['profile', 'projects'])(Homepage)

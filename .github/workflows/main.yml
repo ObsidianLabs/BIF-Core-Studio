@@ -2,8 +2,11 @@ name: Build Main
 
 on:
   push:
+<<<<<<< HEAD
     branches:
       - develop
+=======
+>>>>>>> origin/develop
     tags:
       - 'v*'
   workflow_dispatch:
@@ -14,7 +17,11 @@ env:
   eth_components: eth-components
   share_components: electron-components
   project_build: eth
+<<<<<<< HEAD
   project_project: eth
+=======
+  project_project: bif
+>>>>>>> origin/develop
   project_name: BIF Core Studio
   project_build_script: yarn && REACT_APP_ENV=development yarn dist
   os_matrix: '[\"macos-latest\", \"ubuntu-18.04\", \"windows-2019\"]'
@@ -120,7 +127,7 @@ jobs:
       - name: Checkout ${{ env.project_name }}
         uses: actions/checkout@v2
         with:
-          ref: feat/update-bif-studio
+          ref: develop
           path: studio
 
       - name: Extract version
