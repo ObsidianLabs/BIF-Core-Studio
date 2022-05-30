@@ -35,13 +35,7 @@ function makeProjectManager(Base) {
 				let base64Content
 				try {
 					console.log(contractFileNode.path, 'contractFileNode.path')
-					const bytecode = await fileOps.current.readFile(contractFileNode.path)
-					console.log(bytecode)
-					base64Content = btoa(
-						encodeURIComponent(bytecode).replace(/%([0-9A-F]{2})/g, function (match, p1) {
-							return String.fromCharCode("0x" + p1);
-						})
-					)
+					const base64Content = await fileOps.current.readFile(contractFileNode.path.replace('.wasm', '.bin'))
 					console.log(base64Content)
 					// const arr = Uint8Array.from(content)
 					// arr.forEach(n => buffer.push(String.fromCharCode(n)))
