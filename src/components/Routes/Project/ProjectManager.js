@@ -116,13 +116,12 @@ function makeProjectManager(Base) {
 		}
 
 		buildCppContractObj(contractName, abi, bytecode, base64Content) {
-			console.log(base64Content)
 			return {
 				contractName,
 				abi,
 				bytecode: base64Content,
 				payload: base64Content,
-				vmType: 2,
+				vmType: 3,
 			}
 		}
 
@@ -136,6 +135,7 @@ function makeProjectManager(Base) {
 		}
 
 		validateDeployment(contractObj) {
+			console.log(contractObj, 'validateDeployment')
 			if (contractObj.vmType) {
 				return {
 					abi: contractObj.abi,
@@ -143,7 +143,8 @@ function makeProjectManager(Base) {
 					deployedBytecode: `0x${contractObj.bytecode}`,
 					options: { vmType: contractObj.vmType }
 				}
-			} else {
+			}
+			else {
 				return super.validateDeployment(contractObj)
 			}
 		}
