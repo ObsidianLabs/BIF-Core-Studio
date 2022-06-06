@@ -144,8 +144,8 @@ export default class ContractPage extends PureComponent {
     try {
       abi = JSON.parse(redux.getState().abis.getIn([`${value}`, 'abi'])).output.abi
     } catch {}
-    const contract = networkManager.sdk.contractFrom({ ...abi, address: value })
 
+    const contract = networkManager.sdk.contractFrom({ abi, address: value })
     let ContractInspector = null
     if (!abi) {
       ContractInspector = (

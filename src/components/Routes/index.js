@@ -40,25 +40,12 @@ NewProjectModal.defaultProps = {
       group: `solidity`,
       badge: `Solidity`,
       children: [
-        { id: 'coin', display: 'Coin' },
+        { id: 'erc20', display: 'ERC20' },
         { id: 'sol-dna721', display: 'DNA721' },
+        { id: 'sol-counter', display: 'Counter' },
       ],
     },
-    // {
-    //   group: `go`,
-    //   badge: `Go`,
-    //   children: [
-    //     { id: 'go-counter', display: 'Counter' },
-    //   ],
-    // },
-    // {
-    //   group: `java`,
-    //   badge: `Java`,
-    //   children: [
-    //     { id: 'java-counter', display: 'Counter' },
-    //     { id: 'java-erc20', display: 'ERC20' },
-    //   ],
-    // },
+
   ]
 }
 
