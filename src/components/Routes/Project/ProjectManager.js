@@ -58,19 +58,6 @@ function makeProjectManager(Base) {
             path: abiPath,
             pathInProject: contractFileNode.pathInProject,
           }],
-          getConstructorAbiArgs: contractObj => {
-            return [
-              contractObj.output.abi.map(item => {
-                return {
-                  ...item,
-                  inputs: item.input,
-                  type: item.type === 'Action' ? 'function' : '',
-                  stateMutability: item.constant ? 'view' : ''
-                }
-              }),
-              { key: 'name', value: 'init' }
-            ]
-          }
         },
           (abi, allParameters) => this.pushDeployment(this.buildCppContractObj(allParameters.contractName, null, base64Content, base64Content), allParameters),
           (abi, allParameters) => this.estimate(this.buildCppContractObj(allParameters.contractName, null, base64Content, base64Content), allParameters)
@@ -95,19 +82,6 @@ function makeProjectManager(Base) {
             path: abiPath,
             pathInProject: contractFileNode.pathInProject,
           }],
-          getConstructorAbiArgs: contractObj => {
-            return [
-              contractObj.output.abi.map(item => {
-                return {
-                  ...item,
-                  inputs: item.input,
-                  type: item.type === 'Action' ? 'function' : '',
-                  stateMutability: item.constant ? 'view' : ''
-                }
-              }),
-              { key: 'name', value: 'init' }
-            ]
-          }
         },
           (abi, allParameters) => this.pushDeployment(this.buildJSContractObj(allParameters.contractName, null, sourceCode), allParameters),
           (abi, allParameters) => this.estimate(this.buildJSContractObj(allParameters.contractName, null, sourceCode), allParameters)
@@ -135,17 +109,7 @@ function makeProjectManager(Base) {
             pathInProject: contractFileNode.pathInProject,
           }],
           getConstructorAbiArgs: contractObj => {
-            return [
-              contractObj.output.abi.map(item => {
-                return {
-                  ...item,
-                  inputs: item.input,
-                  type: item.type === 'Action' ? 'function' : '',
-                  stateMutability: item.constant ? 'view' : ''
-                }
-              }),
-              { key: 'name', value: 'init' }
-            ]
+            return contractObj.output.abi
           }
         },
           (abi, allParameters) => this.pushDeployment(this.buildContractObj(allParameters.contractName, abi, bytecode), allParameters),
@@ -190,7 +154,7 @@ function makeProjectManager(Base) {
           abi: contractObj.abi,
           bytecode: contractObj.bytecode,
           deployedBytecode: `0x${contractObj.bytecode}`,
-          options: { vmType: contractObj.vmType }
+          options: { vmType: contractObj.vmType, contractName: contractObj.contractName  }
         }
       } else if (contractObj.vmType === 0) {
         return {
@@ -198,6 +162,7 @@ function makeProjectManager(Base) {
           bytecode: contractObj.bytecode,
           deployedBytecode: `0x${contractObj.bytecode}`,
           options: { vmType: contractObj.vmType }
+          // add contract name
         }
       } else {
         return super.validateDeployment(contractObj)
