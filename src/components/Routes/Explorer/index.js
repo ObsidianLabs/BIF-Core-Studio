@@ -1,24 +1,12 @@
-import React from 'react'
-
 import Explorer, { TransferButton } from '@obsidians/explorer'
-import FaucetButton from './FaucetButton'
-import ConvertButton from './ConvertButton'
 
 TransferButton.defaultProps = {
-  addressLength: 50,
+	addressLength: 50,
 }
 
 Explorer.defaultProps = {
 	...Explorer.defaultProps,
 	valueFormatter: value => value,
 }
-
-// Explorer.defaultProps = {
-//   ...Explorer.defaultProps,
-//   ExtraToolbarButtons: ({ explorer, value, ...otherProps }) => <>
-//     <ConvertButton explorer={explorer} address={value} {...otherProps} />
-//     <FaucetButton explorer={explorer} address={value} {...otherProps} />
-//   </>,
-// }
 
 export default Explorer

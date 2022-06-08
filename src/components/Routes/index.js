@@ -29,13 +29,13 @@ NewProjectModal.defaultProps = {
     //     { id: 'cpp-helloworld', display: 'helloworld' },
     //   ],
     // },
-    // {
-    //   group: `javascript`,
-    //   badge: `JavaScript`,
-    //   children: [
-    //     { id: 'js-dna721', display: 'DNA721' },
-    //   ],
-    // },
+    {
+      group: `javascript`,
+      badge: `JavaScript`,
+      children: [
+        { id: 'js-dna721', display: 'DNA721' },
+      ],
+    },
     {
       group: `solidity`,
       badge: `Solidity`,

@@ -30,32 +30,18 @@ export default class ContractActions extends Component {
 	executeInvoke = async () => {
 		const args = this.args.current.getArgs()
 		this.setState({ executing: true })
-
 		try {
-			const tx = await this.props.contract.execute(
+			await this.props.contract.execute(
 				this.state.method,
 				{ json: args },
-				{ from: this.state.signer, value: '0' },
-				'wasm'
-			)
-
-			await queue.add(
-				() => networkManager.sdk.sendTransaction(tx, this.state.signer),
 				{
-					contractAddress: this.props.contract.address,
-					name: this.props.contract.name,
-					functionName: this.state.method,
-					signer: this.state.signer,
-					params: args,
-					value: '0',
-				},
-				{
-					failed: err => console.warn(err),
+					ext: 'js',
+					from: this.state.signer
 				}
 			)
 		} catch (e) {
 			console.warn(e)
-			notification.error('Invoke Failed', e.message)
+			notification.error('调用失败', e.message)
 		}
 		this.setState({ executing: false })
 	}
