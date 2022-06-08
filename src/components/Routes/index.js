@@ -34,6 +34,7 @@ NewProjectModal.defaultProps = {
       badge: `Solidity`,
       children: [
         { id: 'coin', display: 'Coin' },
+        { id: 'sol-dna721', display: 'DNA721' },
       ],
     },
     // {
