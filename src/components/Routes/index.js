@@ -42,7 +42,7 @@ NewProjectModal.defaultProps = {
       children: [
         // { id: 'erc20', display: 'ERC20' },
         { id: 'coin', display: 'Coin' },
-        // { id: 'sol-dna721', display: 'DNA721' },
+        { id: 'sol-dna721', display: 'DNA721' },
         // { id: 'sol-counter', display: 'Counter' },
       ],
     },
