@@ -118,6 +118,15 @@ export default class ContractPage extends PureComponent {
       )
     }
 
+    if(!networkManager.sdk.utils.isValidAddress(value)) {
+      return (
+        <Screen>
+          <h4 className='display-4'>无效地址</h4>
+          <p className='lead'>{value}</p>
+        </Screen>
+      )
+    }
+
     if (loading) {
       return <LoadingScreen />
     }
@@ -165,7 +174,6 @@ export default class ContractPage extends PureComponent {
       const events = abi.filter(item => item.type === 'event')
       const actions = functions.filter(item => ['view', 'pure'].indexOf(item.stateMutability) === -1)
       const views = functions.filter(item => ['view', 'pure'].indexOf(item.stateMutability) > -1)
-      console.log(contract, views)
       ContractInspector = (
         <div className='d-flex p-relative h-100 w-100'>
           <SplitPane
