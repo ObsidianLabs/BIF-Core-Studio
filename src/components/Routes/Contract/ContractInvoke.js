@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-
 import {
 	UncontrolledButtonDropdown,
 	DropdownToggle,
@@ -7,14 +6,12 @@ import {
 	Badge,
 	ToolbarButton,
 } from '@obsidians/ui-components'
-
+import Highlight from 'react-highlight'
 import notification from '@obsidians/notification'
 import moment from 'moment'
 
 import { DropdownCard } from '@obsidians/contract'
 import { KeypairInputSelector } from '@obsidians/keypair'
-import { networkManager } from '@obsidians/network'
-import queue from '@obsidians/eth-queue'
 
 import Args from './Args'
 
@@ -27,11 +24,32 @@ export default class ContractActions extends Component {
 
 	args = React.createRef()
 
+	renderResult = () => {
+		const { actionError, actionResult } = this.state
+		if (actionError) {
+			return (
+				<div>
+					<span>{actionError}</span>
+				</div>
+			)
+		}
+
+		if (actionResult) {
+			return (
+				<Highlight language='javascript' className='pre-wrap break-all small' element='pre'>
+					<code>{JSON.stringify(actionResult, null, 2)}</code>
+				</Highlight>
+			)
+		}
+
+		return <div className='small'>(None)</div>
+	}
+
 	executeInvoke = async () => {
 		const args = this.args.current.getArgs()
 		this.setState({ executing: true })
 		try {
-			await this.props.contract.execute(
+			const res = await this.props.contract.execute(
 				this.state.method,
 				{ json: args },
 				{
@@ -39,9 +57,14 @@ export default class ContractActions extends Component {
 					from: this.state.signer
 				}
 			)
+			console.log(res)
+			this.setState({
+				actionResult: res.raw
+			})
 		} catch (e) {
 			console.warn(e)
 			notification.error('调用失败', e.message)
+			this.setState({ actionError: e })
 		}
 		this.setState({ executing: false })
 	}
@@ -114,6 +137,18 @@ export default class ContractActions extends Component {
 						value={this.state.signer}
 						onChange={signer => this.setState({ signer })}
 					/>
+				</DropdownCard>
+				<DropdownCard
+					isOpen
+					title='Result'
+					overflow
+					right={
+						this.state.actionError
+							? <Badge color='danger'>Error</Badge>
+							: this.state.actionResult ? <Badge color='success'>Success</Badge> : null
+					}
+				>
+					{this.renderResult()}
 				</DropdownCard>
 			</div>
 		)

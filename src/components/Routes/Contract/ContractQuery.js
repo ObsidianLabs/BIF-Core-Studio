@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-
 import {
   UncontrolledButtonDropdown,
   DropdownToggle,
@@ -7,12 +6,10 @@ import {
   ToolbarButton,
   Badge,
 } from '@obsidians/ui-components'
-
 import moment from 'moment'
-
+import Highlight from 'react-highlight'
 import { DropdownCard } from '@obsidians/contract'
 import { KeypairInputSelector } from '@obsidians/keypair'
-
 import Args from './Args'
 
 export default class ContractTable extends Component {
@@ -21,7 +18,6 @@ export default class ContractTable extends Component {
     executing: false,
     actionError: '',
     actionResult: '',
-    // results: [],
   }
 
   args = React.createRef()
@@ -31,19 +27,12 @@ export default class ContractTable extends Component {
     this.setState({ executing: true })
 
     try {
-      const result = await this.props.contract.query(this.state.method, { json: args }, { from: this.state.signer }, 'wasm')
+      const result = await this.props.contract.query(this.state.method, { json: args }, { from: this.state.signer, ext: 'js' })
       this.setState({
         executing: false,
         actionError: '',
-        actionResult: typeof result === 'string' ? result : JSON.stringify(result),
+        actionResult: result.raw,
       })
-      // this.setState({
-      //   results: [{
-      //     ts: moment().unix(),
-      //     args: JSON.stringify(args),
-      //     result: typeof result === 'string' ? result : JSON.stringify(result),
-      //   }, ...this.state.results]
-      // })
     } catch (e) {
       console.warn(e)
       this.setState({ executing: false, actionError: e.message, actionResult: '' })
@@ -70,13 +59,12 @@ export default class ContractTable extends Component {
       return (
         <tr key={`result-${index}`}>
           <td className='small'>{moment.unix(row.ts).format('MM/DD HH:mm:ss')}</td>
-          {/* <td className='small'>{row.signer}</td> */}
           <td><code className='small break-all'>{row.args}</code></td>
           <td>
             {
               row.result
-              ? <span className='text-success mr-1'><i className='fas fa-check-circle' /></span>
-              : <span className='text-danger mr-1'><i className='fas fa-times-circle' /></span>
+                ? <span className='text-success mr-1'><i className='fas fa-check-circle' /></span>
+                : <span className='text-danger mr-1'><i className='fas fa-times-circle' /></span>
             }
             <span>{row.result?.toString()}</span>
           </td>
@@ -89,25 +77,25 @@ export default class ContractTable extends Component {
     const { actionError, actionResult } = this.state
     if (actionError) {
       return (
-        <div>
-          <span>{actionError}</span>
-        </div>
+        <Highlight language='javascript' className='pre-wrap break-all small' element='pre'>
+          <code>{JSON.stringify(actionError, null, 2)}</code>
+        </Highlight>
       )
     }
-    
+
     if (actionResult) {
       return (
-        <pre className='text-body pre-wrap break-all small user-select'>
-          {actionResult}
-        </pre>
+        <Highlight language='javascript' className='pre-wrap break-all small' element='pre'>
+          <code>{JSON.stringify(actionResult, null, 2)}</code>
+        </Highlight>
       )
     }
 
     return <div className='small'>(None)</div>
   }
 
-  render () {
-    const { signer, contract } = this.props
+  render() {
+    const { signer } = this.props
 
     return (
       <div className='d-flex flex-column align-items-stretch h-100'>
