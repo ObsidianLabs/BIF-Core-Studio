@@ -1,6 +1,7 @@
 import notification from '@obsidians/notification'
 import fileOps from '@obsidians/file-ops'
 import { ProjectManager } from '@obsidians/project'
+import { t } from '@obsidians/i18n'
 
 function makeProjectManager(Base) {
 	return class ProjectManager extends Base {
@@ -17,6 +18,7 @@ function makeProjectManager(Base) {
 
 		async getDefaultContractFileNode() {
 			const settings = await this.checkSettings()
+			console.log(settings)
 			if (!settings?.deploy) {
 				return
 			}
@@ -29,6 +31,8 @@ function makeProjectManager(Base) {
 
 		async deploy(contractFileNode) {
 			contractFileNode = contractFileNode || await this.getDefaultContractFileNode()
+			console.log(contractFileNode)
+
 			if (contractFileNode?.path?.endsWith('.wasm')) {
 				const abiPath = contractFileNode.path.replace('.wasm', '.abi')
 				// const abiName = fileOps.current.path.parse(abiPath).base
@@ -42,7 +46,7 @@ function makeProjectManager(Base) {
 					// const bin = buffer.join('')
 					// console.log(content, 'bin')
 				} catch (e) {
-					notification.error('Deploy Error', e.message)
+					notification.error(t('contract.deploy.fail'), e.message)
 					return
 				}
 
@@ -55,22 +59,33 @@ function makeProjectManager(Base) {
 						path: abiPath,
 						pathInProject: contractFileNode.pathInProject,
 					}],
-					getConstructorAbiArgs: contractObj => {
-						return [
-							contractObj.output.abi.map(item => {
-								return {
-									...item,
-									inputs: item.input,
-									type: item.type === 'Action' ? 'function' : '',
-									stateMutability: item.constant ? 'view' : ''
-								}
-							}),
-							{ key: 'name', value: 'init' }
-						]
-					}
 				},
 					(abi, allParameters) => this.pushDeployment(this.buildCppContractObj(allParameters.contractName, null, base64Content, base64Content), allParameters),
 					(abi, allParameters) => this.estimate(this.buildCppContractObj(allParameters.contractName, null, base64Content, base64Content), allParameters)
+				)
+
+			} else if (contractFileNode?.path?.endsWith('.js')) {
+				const abiPath = contractFileNode.path
+				let sourceCode
+				try {
+					sourceCode = await fileOps.current.readFile(contractFileNode.path)
+				} catch (e) {
+					notification.error(t('contract.deploy.fail'), e.message)
+					return
+				}
+
+				this.deployButton.getDeploymentParameters({
+					contractFileNode: {
+						path: abiPath,
+						pathInProject: contractFileNode.pathInProject,
+					},
+					contracts: [{
+						path: abiPath,
+						pathInProject: contractFileNode.pathInProject,
+					}],
+				},
+					(abi, allParameters) => this.pushDeployment(this.buildJSContractObj(allParameters.contractName, null, sourceCode), allParameters),
+					(abi, allParameters) => this.estimate(this.buildJSContractObj(allParameters.contractName, null, sourceCode), allParameters)
 				)
 
 			} else {
@@ -81,7 +96,7 @@ function makeProjectManager(Base) {
 				try {
 					bytecode = await fileOps.current.readFile(contractFileNode.path.replace('_meta.json', '.bin'))
 				} catch (e) {
-					notification.error('Deploy Error', e.message)
+					notification.error(t('contract.deploy.fail'), e.message)
 					return
 				}
 
@@ -95,17 +110,7 @@ function makeProjectManager(Base) {
 						pathInProject: contractFileNode.pathInProject,
 					}],
 					getConstructorAbiArgs: contractObj => {
-						return [
-							contractObj.output.abi.map(item => {
-								return {
-									...item,
-									inputs: item.input,
-									type: item.type === 'Action' ? 'function' : '',
-									stateMutability: item.constant ? 'view' : ''
-								}
-							}),
-							{ key: 'name', value: 'init' }
-						]
+						return contractObj.output.abi
 					}
 				},
 					(abi, allParameters) => this.pushDeployment(this.buildContractObj(allParameters.contractName, abi, bytecode), allParameters),
@@ -121,7 +126,16 @@ function makeProjectManager(Base) {
 				abi,
 				bytecode: base64Content,
 				payload: base64Content,
-				vmType: 3,
+				validateDeployment: 3,
+			}
+		}
+
+		buildJSContractObj(contractName, abi, bytecode) {
+			return {
+				contractName,
+				abi,
+				bytecode,
+				vmType: 0,
 			}
 		}
 
@@ -135,16 +149,23 @@ function makeProjectManager(Base) {
 		}
 
 		validateDeployment(contractObj) {
-			console.log(contractObj, 'validateDeployment')
-			if (contractObj.vmType) {
+
+			if (contractObj.vmType === 1) {
+				return {
+					abi: contractObj.abi,
+					bytecode: contractObj.bytecode,
+					deployedBytecode: `0x${contractObj.bytecode}`,
+					options: { vmType: contractObj.vmType, contractName: contractObj.contractName }
+				}
+			} else if (contractObj.vmType === 0) {
 				return {
 					abi: contractObj.abi,
 					bytecode: contractObj.bytecode,
 					deployedBytecode: `0x${contractObj.bytecode}`,
 					options: { vmType: contractObj.vmType }
+					// add contract name
 				}
-			}
-			else {
+			} else {
 				return super.validateDeployment(contractObj)
 			}
 		}

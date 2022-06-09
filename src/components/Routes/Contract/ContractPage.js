@@ -1,18 +1,200 @@
-import redux from '@obsidians/redux'
-import { ContractPage } from '@obsidians/contract'
+import React, { PureComponent } from 'react'
+import classnames from 'classnames'
 
-export default class PlatonContractPage extends ContractPage {
-	getAbiData (codeHash) {
-    const abiData = redux.getState().abis.get(codeHash)?.toJS()
-		console.log(abiData, 'abiData')
-    if (!abiData) {
+import {
+  Screen,
+  LoadingScreen,
+  SplitPane,
+  Button,
+  UncontrolledButtonDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
+} from '@obsidians/ui-components'
+
+import redux from '@obsidians/redux'
+import { networkManager } from '@obsidians/eth-network'
+
+import { ContractActions, ContractViews } from '@obsidians/contract'
+
+import ContractInvoke from './ContractInvoke'
+import ContractQuery from './ContractQuery'
+
+export default class ContractPage extends PureComponent {
+  constructor (props) {
+    super(props)
+    this.abiStorageModal = React.createRef()
+
+    this.state = {
+      error: null,
+      errorType: null,
+      contracts: [],
+      selected: 0,
+      loading: true,
+    }
+    props.cacheLifecycles.didRecover(this.componentDidRecover)
+  }
+
+  componentDidMount () {
+    this.props.onDisplay(this)
+    this.refresh()
+  }
+
+  componentDidUpdate (prevProps) {
+    if (prevProps.value !== this.props.value) {
+      this.refresh()
+    }
+  }
+
+  componentDidRecover = () => {
+    this.props.onDisplay(this)
+  }
+
+  refresh = async () => {
+    this.setState({ loading: false, error: null, contract: null, errorType: null })
+
+    await new Promise(resolve => setTimeout(resolve, 10))
+
+    const value = this.props.value
+
+    if (!value) {
+      this.setState({ loading: false, error: 'No address entered.' })
       return
     }
-    try {
-      abiData.abi = JSON.parse(abiData.abi==="{}"? "[]" : abiData.abi)
-    } catch {
-      throw new Error('Invalid ABI structure.')
+
+    // let contracts
+    // try {
+    //   contracts = await networkManager.sdk.contractsFrom(value)
+    //   this.setState({ loading: false, contracts, selected: 0 })
+    // } catch (e) {
+    //   console.warn(e)
+    //   this.setState({ loading: false, error: e.message })
+    //   return
+    // }
+  }
+
+  selectContract = index => {
+    this.setState({ selected: index })
+  }
+
+  renderContractSelector = () => {
+    const { contracts, selected } = this.state
+    return (
+      <UncontrolledButtonDropdown size='sm'>
+        <DropdownToggle color='primary' caret className='rounded-0 border-0 px-2 border-right-1'>
+          <i className='fas fa-file-invoice mr-1' />
+          <code className='mx-1'><b>{contracts[selected]?.name}</b></code>
+        </DropdownToggle>
+        <DropdownMenu>
+          <DropdownItem header>contracts</DropdownItem>
+          {contracts.map((c, index) => (
+            <DropdownItem
+              key={c.txid}
+              className={classnames({ active: index === selected })}
+              onClick={() => this.selectContract(index)}
+            >
+              <code>{c.name}</code>
+            </DropdownItem>
+          ))}
+        </DropdownMenu>
+      </UncontrolledButtonDropdown>
+    )
+  }
+
+  render () {
+    const { value, signer } = this.props
+    const { loading, contracts, error, selected } = this.state
+
+    if (!networkManager.sdk) {
+      return null
     }
-    return abiData
+
+    if (!value) {
+      return (
+        <Screen>
+          <h4 className='display-4'>New Page</h4>
+          <p className='lead'>Please enter an {process.env.CHAIN_NAME} contract address.</p>
+        </Screen>
+      )
+    }
+
+    if(!networkManager.sdk.utils.isValidAddress(value)) {
+      return (
+        <Screen>
+          <h4 className='display-4'>无效地址</h4>
+          <p className='lead'>{value}</p>
+        </Screen>
+      )
+    }
+
+    if (loading) {
+      return <LoadingScreen />
+    }
+
+    if (error) {
+      return (
+        <Screen>
+          <h4 className='display-4'>Error</h4>
+          <p>{error}</p>
+        </Screen>
+      )
+    }
+
+    // if (!contracts.length) {
+    //   return (
+    //     <Screen>
+    //       <h4 className='display-4'>No Contract</h4>
+    //       <p>There is no deployed contract under this account yet.</p>
+    //     </Screen>
+    //   )
+    // }
+    // const contract = contracts[selected] || {}
+    let abi
+    try {
+      abi = JSON.parse(redux.getState().abis.getIn([`${value}`, 'abi'])).output.abi
+    } catch {}
+
+    const contract = networkManager.sdk.contractFrom({ abi, address: value })
+    let ContractInspector = null
+    if (!abi) {
+      ContractInspector = (
+        <div className='d-flex p-relative h-100 w-100'>
+          <SplitPane
+            split='vertical'
+            defaultSize={Math.floor(window.innerWidth / 2)}
+            minSize={200}
+          >
+            <ContractInvoke signer={signer} contract={contract} />
+            <ContractQuery signer={signer} contract={contract} />
+          </SplitPane>
+        </div>
+      )
+    } else {
+      const functions = abi.filter(item => item.type === 'function')
+      const events = abi.filter(item => item.type === 'event')
+      const actions = functions.filter(item => ['view', 'pure'].indexOf(item.stateMutability) === -1)
+      const views = functions.filter(item => ['view', 'pure'].indexOf(item.stateMutability) > -1)
+      ContractInspector = (
+        <div className='d-flex p-relative h-100 w-100'>
+          <SplitPane
+            split='vertical'
+            defaultSize={Math.floor(window.innerWidth / 2)}
+            minSize={200}
+          >
+            <ContractActions value={value} actions={actions} contract={contract} />
+            <ContractViews value={value} actions={views} contract={contract} signerSelector />
+          </SplitPane>
+        </div>
+      )
+    }
+
+    return (
+      <div className='d-flex flex-column align-items-stretch h-100'>
+        {/* <div className='d-flex border-bottom-1'>
+          {this.renderContractSelector()}
+        </div> */}
+        {ContractInspector}
+      </div>
+    )
   }
 }

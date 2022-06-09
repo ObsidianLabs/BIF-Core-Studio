@@ -1,7 +1,7 @@
 {
   "name": "BIF-Core-Studio",
   "description": "",
-  "version": "0.1.21",
+  "version": "0.1.22",
   "author": {
     "name": "Phil Li",
     "email": "phil.li@obsidians.io",
@@ -18,7 +18,7 @@
     "install": "electron-rebuild",
     "dev:local": "REACT_APP_IPC_SERVER_URL=http://localhost:7001 react-app-rewired start",
     "dev:react": "react-app-rewired start",
-    "build:react": "react-app-rewired build",
+    "build:react": "cross-env NODE_ENV=development react-app-rewired build",
     "build:web": "PUBLIC_URL=/ CDN=true yarn build:react",
     "build:web-dev": "dotenv -e .env PUBLIC_URL=/ CDN=true yarn build:react",
     "dev:main": "webpack --config webpack.main.config.js && electron ./dev/index.js",
