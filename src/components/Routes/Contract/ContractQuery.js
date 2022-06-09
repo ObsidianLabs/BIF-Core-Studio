@@ -35,7 +35,7 @@ export default class ContractTable extends Component {
       })
     } catch (e) {
       console.warn(e)
-      this.setState({ executing: false, actionError: e.message, actionResult: '' })
+      this.setState({ executing: false, actionError: '', actionResult: '' })
     }
   }
 
@@ -98,7 +98,7 @@ export default class ContractTable extends Component {
     const { signer } = this.props
 
     return (
-      <div className='d-flex flex-column align-items-stretch h-100'>
+      <div className='d-flex flex-column align-items-stretch h-100  overflow-auto'>
         <div className='d-flex border-bottom-1'>
           {this.renderTableSelector()}
         </div>

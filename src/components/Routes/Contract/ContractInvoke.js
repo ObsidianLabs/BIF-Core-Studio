@@ -57,14 +57,13 @@ export default class ContractActions extends Component {
 					from: this.state.signer
 				}
 			)
-			console.log(res)
 			this.setState({
 				actionResult: res.raw
 			})
 		} catch (e) {
 			console.warn(e)
 			notification.error('调用失败', e.message)
-			this.setState({ actionError: e })
+			this.setState({ actionError: '' })
 		}
 		this.setState({ executing: false })
 	}
@@ -108,7 +107,7 @@ export default class ContractActions extends Component {
 		const { signer, contract } = this.props
 
 		return (
-			<div className='d-flex flex-column align-items-stretch h-100'>
+			<div className='d-flex flex-column align-items-stretch h-100 overflow-auto'>
 				<div className='d-flex border-bottom-1'>
 					{this.renderActionSelector()}
 				</div>
