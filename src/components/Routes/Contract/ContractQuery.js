@@ -41,12 +41,12 @@ export default class ContractTable extends Component {
             params: args
           })
         })
-        const { error_code, result, error_desc} = await res.json()
+        const { error_code, result, error_desc } = await res.json()
 
-				if(!result) {
-					notification.error('调用失败', error_desc)
-					return
-				}
+        if (!result) {
+          notification.error('调用失败', error_desc)
+          return
+        }
         const abicode = result.abicode
         const invokeRes = await this.props.contract.query(
           this.state.method,
@@ -87,7 +87,7 @@ export default class ContractTable extends Component {
   renderTableSelector = () => <>
     <UncontrolledButtonDropdown size='sm'>
       <DropdownToggle color='secondary' className='rounded-0 border-0 px-2 border-right-1'>
-        <code className='mx-1'><b>Query</b></code>
+        <code className='mx-1'><b>查询</b></code>
       </DropdownToggle>
     </UncontrolledButtonDropdown>
     <ToolbarButton
@@ -147,7 +147,7 @@ export default class ContractTable extends Component {
         <div className='d-flex border-bottom-1'>
           {this.renderTableSelector()}
         </div>
-        <DropdownCard isOpen title='Method'>
+        <DropdownCard isOpen title='方法'>
           <DebouncedInput
             size='sm'
             placeholder='Name of the method'
@@ -157,7 +157,7 @@ export default class ContractTable extends Component {
         </DropdownCard>
         <DropdownCard
           isOpen
-          title='Args'
+          title='参数'
           flex='0 1 auto'
         >
           <Args
@@ -167,19 +167,19 @@ export default class ContractTable extends Component {
         </DropdownCard>
         <DropdownCard
           isOpen
-          title='Authorization'
+          title='授权'
           overflow
         >
           <KeypairInputSelector
             size='sm'
-            label='Signer'
+            label='账户地址'
             value={this.state.signer}
             onChange={signer => this.setState({ signer })}
           />
         </DropdownCard>
         <DropdownCard
           isOpen
-          title='Result'
+          title='结果'
           minHeight='120px'
           right={
             this.state.actionError
