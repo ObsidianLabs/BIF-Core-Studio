@@ -55,8 +55,8 @@ function makeProjectManager(Base) {
 						pathInProject: contractFileNode.pathInProject,
 					}],
 				},
-					(abi, allParameters) => this.pushDeployment(this.buildJSContractObj(allParameters.contractName, null, sourceCode), allParameters),
-					(abi, allParameters) => this.estimate(this.buildJSContractObj(allParameters.contractName, null, sourceCode), allParameters)
+					(abi, allParameters) => this.pushDeployment(this.buildCppContractObj(allParameters.contractName, abi, base64Content, base64Content), allParameters),
+					(abi, allParameters) => this.estimate(this.buildCppContractObj(allParameters.contractName, abi, base64Content, base64Content), allParameters)
 				)
 
 			} else if (contractFileNode?.path?.endsWith('.js')) {
@@ -121,7 +121,7 @@ function makeProjectManager(Base) {
 				abi,
 				bytecode: base64Content,
 				payload: base64Content,
-				validateDeployment: 3,
+				vmType: 3
 			}
 		}
 
@@ -158,6 +158,14 @@ function makeProjectManager(Base) {
 					bytecode: contractObj.bytecode,
 					deployedBytecode: `0x${contractObj.bytecode}`,
 					options: { vmType: contractObj.vmType }
+					// add contract name
+				}
+			} else if (contractObj.vmType === 3) {
+				return {
+					abi: contractObj.abi,
+					bytecode: contractObj.bytecode,
+					deployedBytecode: `0x${contractObj.bytecode}`,
+					options: { vmType: contractObj.vmType, contractName: contractObj.contractName }
 					// add contract name
 				}
 			} else {
