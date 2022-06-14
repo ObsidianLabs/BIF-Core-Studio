@@ -37,6 +37,13 @@ NewProjectModal.defaultProps = {
       ],
     },
     {
+      group: `javascript`,
+      badge: `JavaScript`,
+      children: [
+        { id: 'js-dna721', display: 'DNA721' },
+      ],
+    },
+    {
       group: `solidity`,
       badge: `Solidity`,
       children: [
