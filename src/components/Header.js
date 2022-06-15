@@ -28,7 +28,7 @@ class HeaderWithRedux extends PureComponent {
     this.setState({ networkList: List(networkManager.networks) }, this.setNetwork)
 
     if (!networkManager.network || !networkManager.sdk) {
-      networkManager.setNetwork(networkManager.networks[0], { notify: false })
+      networkManager.setNetwork(networkManager.networks[0], { notify: true })
     }
     this.navGuard = new NavGuard(this.props.history)
   }

@@ -3,9 +3,9 @@ const os = require('os')
 const path = require('path')
 const isDev = require('electron-is-dev')
 const shellPath = require('shell-path')
-
 const { ipc } = require('@obsidians/ipc')
 const { TerminalChannelManager } = require('@obsidians/terminal')
+const getTheLock = app.requestSingleInstanceLock();
 
 if (os.type() === 'Linux') {
   app.disableHardwareAcceleration()
@@ -18,22 +18,26 @@ const oldIpc = require('./ipc')
 let win
 let terminalChannelManager
 app.on('ready', async () => {
-  if (process.platform !== 'win32') {
-    process.env.PATH = shellPath.sync() || [
-      './node_modules/.bin',
-      '/.nodebrew/current/bin',
-      '/usr/local/bin',
-      process.env.PATH
-    ].join(':')
-  }
+  if (!getTheLock) {
+    app.quit()
+  } else {
+    if (process.platform !== 'win32') {
+      process.env.PATH = shellPath.sync() || [
+        './node_modules/.bin',
+        '/.nodebrew/current/bin',
+        '/usr/local/bin',
+        process.env.PATH
+      ].join(':')
+    }
 
-  terminalChannelManager = new TerminalChannelManager()
-  init()
-  ipc.window = createWindow()
-  createMenu()
+    terminalChannelManager = new TerminalChannelManager()
+    init()
+    ipc.window = createWindow()
+    createMenu()
+  }
 })
 
-function createWindow () {
+function createWindow() {
   win = new BrowserWindow({
     width: 1200,
     height: 800,
