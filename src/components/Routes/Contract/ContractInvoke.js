@@ -9,7 +9,7 @@ import {
 import Highlight from 'react-highlight'
 import notification from '@obsidians/notification'
 import moment from 'moment'
-
+import redux from '@obsidians/redux'
 import { DropdownCard } from '@obsidians/contract'
 import { KeypairInputSelector } from '@obsidians/keypair'
 
@@ -47,6 +47,58 @@ export default class ContractActions extends Component {
 
 	executeInvoke = async () => {
 		const args = this.args.current.getArgs()
+		const address = this.props.contract.address
+		const abi = redux.getState().abis.getIn([address])?.toJS()
+		console.log(args)
+		const transformArgs = {}
+		for(let i in args) {
+			if(Number(args[i]).toString() === 'NaN') {
+				transformArgs[i] = args[i]
+			} else if(typeof Number(args[i]) === 'number') {
+				transformArgs[i] = Number(args[i])
+			}
+		}
+		console.log(transformArgs)
+		if (abi.vmType === 3) {
+			try {
+				const res = await fetch('http://68.79.22.110:30001/wasmAbiEncode', {
+					method: 'POST',
+					mode: 'cors',
+					body: JSON.stringify({
+						abi: abi.abi,
+						method: this.state.method,
+						params: JSON.stringify(transformArgs)
+					})
+				})
+				const { error_code, result, error_desc} = await res.json()
+
+				if(!result) {
+					notification.error('调用失败', error_desc)
+					return
+				}
+	
+				const abicode = result.abicode
+				const invokeRes =  await this.props.contract.execute(
+					this.state.method,
+					{ json: {
+						abicode,
+						...args
+					} },
+					{
+						ext: 'cpp',
+						from: this.state.signer
+					}
+				)
+				this.setState({
+					actionResult: invokeRes.raw
+				})
+				return 
+			} catch (e) {
+				notification.error('调用失败', e.message)
+				console.error(e)
+				return
+			}
+		}
 		this.setState({ executing: true })
 		try {
 			const res = await this.props.contract.execute(
@@ -72,7 +124,7 @@ export default class ContractActions extends Component {
 		return <>
 			<UncontrolledButtonDropdown size='sm'>
 				<DropdownToggle color='secondary' className='rounded-0 border-0 px-2 border-right-1'>
-					<code className='mx-1'><b>Invoke</b></code>
+					<code className='mx-1'><b>调用</b></code>
 				</DropdownToggle>
 			</UncontrolledButtonDropdown>
 			<ToolbarButton
@@ -111,15 +163,15 @@ export default class ContractActions extends Component {
 				<div className='d-flex border-bottom-1'>
 					{this.renderActionSelector()}
 				</div>
-				<DropdownCard isOpen title='Method'>
+				<DropdownCard isOpen title='方法名'>
 					<DebouncedInput
 						size='sm'
-						placeholder='Name of the method'
+						placeholder='需要发起调用的方法名'
 						value={this.state.method}
 						onChange={method => this.setState({ method })}
 					/>
 				</DropdownCard>
-				<DropdownCard isOpen title='Args'>
+				<DropdownCard isOpen title='参数'>
 					<Args
 						ref={this.args}
 						initial={{ from: signer, to: '', token: '' }}
@@ -127,19 +179,19 @@ export default class ContractActions extends Component {
 				</DropdownCard>
 				<DropdownCard
 					isOpen
-					title='Authorization'
+					title='授权'
 					overflow
 				>
 					<KeypairInputSelector
 						size='sm'
-						label='Signer'
+						label='账户地址'
 						value={this.state.signer}
 						onChange={signer => this.setState({ signer })}
 					/>
 				</DropdownCard>
 				<DropdownCard
 					isOpen
-					title='Result'
+					title='结果'
 					overflow
 					right={
 						this.state.actionError

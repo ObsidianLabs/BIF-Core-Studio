@@ -11,6 +11,8 @@ import Highlight from 'react-highlight'
 import { DropdownCard } from '@obsidians/contract'
 import { KeypairInputSelector } from '@obsidians/keypair'
 import Args from './Args'
+import redux from '@obsidians/redux'
+import notification from '@obsidians/notification'
 
 export default class ContractTable extends Component {
   state = {
@@ -25,7 +27,50 @@ export default class ContractTable extends Component {
   executeQuery = async () => {
     const args = this.args.current.getArgs()
     this.setState({ executing: true })
+    const address = this.props.contract.address
+    const abi = redux.getState().abis.getIn([address])?.toJS()
 
+    if (abi.vmType === 3) {
+      try {
+        const res = await fetch('http://68.79.22.110:30001/wasmAbiEncode', {
+          method: 'POST',
+          mode: 'cors',
+          body: JSON.stringify({
+            abi: abi.abi,
+            method: this.state.method,
+            params: args
+          })
+        })
+        const { error_code, result, error_desc } = await res.json()
+
+        if (!result) {
+          notification.error('调用失败', error_desc)
+          return
+        }
+        const abicode = result.abicode
+        const invokeRes = await this.props.contract.query(
+          this.state.method,
+          {
+            json: {
+              ...args
+            }
+          },
+          {
+            ext: 'js',
+            abicode,
+            from: this.state.signer
+          }
+        )
+        this.setState({
+          actionResult: invokeRes.raw
+        })
+        return
+      } catch (e) {
+        notification.error('调用失败', e.message)
+        console.error(e)
+        return
+      }
+    }
     try {
       const result = await this.props.contract.query(this.state.method, { json: args }, { from: this.state.signer, ext: 'js' })
       this.setState({
@@ -42,7 +87,7 @@ export default class ContractTable extends Component {
   renderTableSelector = () => <>
     <UncontrolledButtonDropdown size='sm'>
       <DropdownToggle color='secondary' className='rounded-0 border-0 px-2 border-right-1'>
-        <code className='mx-1'><b>Query</b></code>
+        <code className='mx-1'><b>查询</b></code>
       </DropdownToggle>
     </UncontrolledButtonDropdown>
     <ToolbarButton
@@ -102,7 +147,7 @@ export default class ContractTable extends Component {
         <div className='d-flex border-bottom-1'>
           {this.renderTableSelector()}
         </div>
-        <DropdownCard isOpen title='Method'>
+        <DropdownCard isOpen title='方法'>
           <DebouncedInput
             size='sm'
             placeholder='Name of the method'
@@ -112,7 +157,7 @@ export default class ContractTable extends Component {
         </DropdownCard>
         <DropdownCard
           isOpen
-          title='Args'
+          title='参数'
           flex='0 1 auto'
         >
           <Args
@@ -122,19 +167,19 @@ export default class ContractTable extends Component {
         </DropdownCard>
         <DropdownCard
           isOpen
-          title='Authorization'
+          title='授权'
           overflow
         >
           <KeypairInputSelector
             size='sm'
-            label='Signer'
+            label='账户地址'
             value={this.state.signer}
             onChange={signer => this.setState({ signer })}
           />
         </DropdownCard>
         <DropdownCard
           isOpen
-          title='Result'
+          title='结果'
           minHeight='120px'
           right={
             this.state.actionError

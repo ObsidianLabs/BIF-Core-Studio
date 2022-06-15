@@ -22,13 +22,13 @@ NewProjectModal.defaultProps = {
   defaultFramework: 'alaya-truffle-docker',
   FrameworkSelector,
   templates: [
-    // {
-    //   group: `cpp`,
-    //   badge: `C++`,
-    //   children: [
-    //     { id: 'cpp-helloworld', display: 'helloworld' },
-    //   ],
-    // },
+    {
+      group: `cpp`,
+      badge: `C++`,
+      children: [
+        { id: 'cpp-helloworld', display: 'helloworld' },
+      ],
+    },
     {
       group: `javascript`,
       badge: `JavaScript`,
@@ -40,10 +40,7 @@ NewProjectModal.defaultProps = {
       group: `solidity`,
       badge: `Solidity`,
       children: [
-        // { id: 'erc20', display: 'ERC20' },
-        { id: 'coin', display: 'Coin' },
         { id: 'sol-dna721', display: 'DNA721' },
-        // { id: 'sol-counter', display: 'Counter' },
       ],
     },
 

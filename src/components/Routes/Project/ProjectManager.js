@@ -34,17 +34,12 @@ function makeProjectManager(Base) {
 			console.log(contractFileNode)
 
 			if (contractFileNode?.path?.endsWith('.wasm')) {
+				const settings = await this.checkSettings()
 				const abiPath = contractFileNode.path.replace('.wasm', '.abi')
-				// const abiName = fileOps.current.path.parse(abiPath).base
 				let base64Content
 				try {
-					console.log(contractFileNode.path, 'contractFileNode.path')
-					const base64Content = await fileOps.current.readFile(contractFileNode.path.replace('.wasm', '.bin'))
-					console.log(base64Content)
-					// const arr = Uint8Array.from(content)
-					// arr.forEach(n => buffer.push(String.fromCharCode(n)))
-					// const bin = buffer.join('')
-					// console.log(content, 'bin')
+					const base64FilePath = contractFileNode.path.replace(settings.deploy, 'output.bin')
+					base64Content = await fileOps.current.readFile(base64FilePath)
 				} catch (e) {
 					notification.error(t('contract.deploy.fail'), e.message)
 					return
@@ -60,8 +55,8 @@ function makeProjectManager(Base) {
 						pathInProject: contractFileNode.pathInProject,
 					}],
 				},
-					(abi, allParameters) => this.pushDeployment(this.buildCppContractObj(allParameters.contractName, null, base64Content, base64Content), allParameters),
-					(abi, allParameters) => this.estimate(this.buildCppContractObj(allParameters.contractName, null, base64Content, base64Content), allParameters)
+					(abi, allParameters) => this.pushDeployment(this.buildCppContractObj(allParameters.contractName, abi, base64Content, base64Content), allParameters),
+					(abi, allParameters) => this.estimate(this.buildCppContractObj(allParameters.contractName, abi, base64Content, base64Content), allParameters)
 				)
 
 			} else if (contractFileNode?.path?.endsWith('.js')) {
@@ -126,7 +121,7 @@ function makeProjectManager(Base) {
 				abi,
 				bytecode: base64Content,
 				payload: base64Content,
-				validateDeployment: 3,
+				vmType: 3
 			}
 		}
 
@@ -163,6 +158,14 @@ function makeProjectManager(Base) {
 					bytecode: contractObj.bytecode,
 					deployedBytecode: `0x${contractObj.bytecode}`,
 					options: { vmType: contractObj.vmType }
+					// add contract name
+				}
+			} else if (contractObj.vmType === 3) {
+				return {
+					abi: contractObj.abi,
+					bytecode: contractObj.bytecode,
+					deployedBytecode: `0x${contractObj.bytecode}`,
+					options: { vmType: contractObj.vmType, contractName: contractObj.contractName }
 					// add contract name
 				}
 			} else {
