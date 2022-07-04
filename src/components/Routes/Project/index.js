@@ -4,6 +4,10 @@ import platform from '@obsidians/platform'
 import { connect } from '@obsidians/redux'
 import Project, { DeployButton, NewProjectModal } from '@obsidians/project'
 import ProjectManager from './ProjectManager'
+import ProjectSettingsTab from './ProjectSettingsTab'
+import { modelSessionManager } from '@obsidians/code-editor'
+
+modelSessionManager.registerCustomTab('settings', ProjectSettingsTab, 'Project Settings')
 
 DeployButton.defaultProps = {
   skipEstimate: true,
@@ -45,4 +49,5 @@ class ProjectWithProps extends PureComponent {
     );
   }
 }
+
 export default connect(['uiState', 'projects'])(ProjectWithProps)
